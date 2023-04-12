@@ -26,16 +26,13 @@
 #include <font8x8_basic.h>
 
 #define TAG "Example"
-#define _I2C_NUMBER(num) I2C_NUM_##num
-#define I2C_NUMBER(num) _I2C_NUMBER(num)
 
 #define I2C_MASTER_SCL_IO 4               /*!< gpio number for I2C master clock */
 #define I2C_MASTER_SDA_IO 5               /*!< gpio number for I2C master data  */
-#define I2C_MASTER_NUM I2C_NUMBER(CONFIG_I2C_MASTER_PORT_NUM) /*!< I2C port number for master dev */
 #define I2C_MASTER_FREQ_HZ CONFIG_I2C_MASTER_FREQUENCY        /*!< I2C master clock frequency */
-#define I2C_MASTER_TX_BUF_DISABLE 0                           /*!< I2C master doesn't need buffer */
-#define I2C_MASTER_RX_BUF_DISABLE 0                           /*!< I2C master doesn't need buffer */
-#define TIME_DELAY_MS 1000 
+#define I2C_MASTER_TX_BUF_DISABLE 0
+#define I2C_MASTER_RX_BUF_DISABLE 0                    /*!< I2C master doesn't need buffer */                         /*!< I2C master doesn't need buffer */
+#define TIME_DELAY_MS 2000 
 
 
 static esp_err_t i2c_master_init(void)
@@ -61,7 +58,7 @@ static esp_err_t i2c_master_init(void)
 void ssd1306_init() {
 	esp_err_t espRc;
 
-	i2c_cmd_handle_t cmd = i2c_cmd_link_create();
+	i2c_cmd_handle_t cmd = i2c_cmd_link_create();                                                                                          
 
 	i2c_master_start(cmd);
 	i2c_master_write_byte(cmd, (OLED_I2C_ADDRESS << 1) | I2C_MASTER_WRITE, true);
@@ -136,10 +133,10 @@ void task_ssd1306_display_text(const void *arg_text) {
 		}
 	}
 
-	vTaskDelete(NULL);
+	// vTaskDelete(NULL);
 }
 
-void task_ssd1306_display_clear(void *ignore) {
+void task_ssd1306_display_clear() {
 	i2c_cmd_handle_t cmd;
 
 	uint8_t clear[128];
@@ -160,7 +157,7 @@ void task_ssd1306_display_clear(void *ignore) {
 		i2c_cmd_link_delete(cmd);
 	}
 
-	vTaskDelete(NULL);
+	// vTaskDelete(NULL);
 }
 
 void app_main(void)
@@ -169,8 +166,10 @@ void app_main(void)
     ssd1306_init();
 	// for(int i=0; i<10; i++)
 	// {}
-    task_ssd1306_display_text("20521766\n20520665\n20522094");
-	vTaskDelay(TIME_DELAY_MS / portTICK_PERIOD_MS);
-	// task_ssd1306_display_clear(" ");
-	// task_ssd1306_display_text("Phuc");
+	while (true)
+	{
+    	task_ssd1306_display_text("20521766\n20520665\n20522094");
+		vTaskDelay(TIME_DELAY_MS / portTICK_PERIOD_MS);
+		task_ssd1306_display_clear();
+	}
 }
